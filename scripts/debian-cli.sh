@@ -4,14 +4,17 @@
 # Tested Root Environments: KernelSU / APatch / Magisk
 
 DEBIANPATH="/data/local/tmp/chrootDebian"
-MOUNT_SCRIPT="/data/data/com.termux/files/home/mount-debian.sh"
-STOP_SCRIPT="/data/data/com.termux/files/home/stop-debian.sh"
-
-if [ ! -f "$MOUNT_SCRIPT" ]; then
-    MOUNT_SCRIPT="$(dirname "$0")/mount-debian.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/mount-debian.sh" ]; then
+    MOUNT_SCRIPT="$SCRIPT_DIR/mount-debian.sh"
+else
+    MOUNT_SCRIPT="/data/data/com.termux/files/home/mount-debian.sh"
 fi
-if [ ! -f "$STOP_SCRIPT" ]; then
-    STOP_SCRIPT="$(dirname "$0")/stop-debian.sh"
+
+if [ -f "$SCRIPT_DIR/stop-debian.sh" ]; then
+    STOP_SCRIPT="$SCRIPT_DIR/stop-debian.sh"
+else
+    STOP_SCRIPT="/data/data/com.termux/files/home/stop-debian.sh"
 fi
 
 is_mounted() {

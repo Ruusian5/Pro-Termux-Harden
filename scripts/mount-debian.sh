@@ -1,7 +1,7 @@
 #!/bin/bash
-# --- ENTERPRISE KERNEL BRIDGE (V0.2) ---
-# Remounts /data with suid so sudo/su SUID binaries work inside the chroot
-# (Android mounts /data nosuid, which breaks setuid in the Debian environment)
+# --- NATIVE DEBIAN CHROOT MOUNT BRIDGE ---
+# Mounts essential filesystems with rslave/rprivate namespace isolation
+# to prevent mount propagation or crashes on host Android OS.
 
 DEBIANPATH="/data/local/tmp/chrootDebian"
 TERMUX_TMP="/data/data/com.termux/files/usr/tmp"
