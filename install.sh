@@ -59,14 +59,16 @@ if ! grep -q "cmds.sh" "$HOME/.bashrc" 2>/dev/null; then
 # --- PRO WORKSTATION HUD ---
 alias agy='bash ~/cmds.sh'
 alias res='bash ~/res.sh'
-alias sd='bash ~/termux-system-shutdown.sh'
+alias sd='bash ~/stop-debian.sh'
 alias fix='bash ~/repair.sh'
 alias gpu='bash ~/gpu-check.sh'
-alias deb='bash ~/cli-bridge.sh'
+alias debian='bash ~/debian-cli.sh shell'
+alias debian-start='bash ~/debian-cli.sh start'
+alias debian-stop='bash ~/debian-cli.sh stop'
+alias debian-status='bash ~/debian-cli.sh status'
 
 if [[ $- == *i* ]]; then
     termux-wake-lock 2>/dev/null
-    { bash ~/mount-debian.sh > /dev/null 2>&1; } & disown
 fi
 EOF
     echo -e "  [✓] Aliases and banner added to .bashrc"

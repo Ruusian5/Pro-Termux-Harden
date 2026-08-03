@@ -9,16 +9,14 @@ TERMUX_TMP="/data/data/com.termux/files/usr/tmp"
 echo -e "\e[1;33m[~] Synchronizing Hardware Bridges...\e[0m"
 
 su -c "
-    # CRITICAL: remount /data with suid so sudo/su SUID binaries work inside chroot
-    busybox mount -o remount,dev,suid /data
-
-    # Helper function for idempotent bind mounts
+    # Helper function for idempotent bind mounts with rslave isolation
+    # (rslave prevents chroot unmount operations from propagating back to host Android OS)
     domount() {
         if ! grep -q -w \"\$2\" /proc/mounts; then
-            mount --bind \"\$1\" \"\$2\"
+            mount --bind \"\$1\" \"\$2\" 2>/dev/null && mount --make-rslave \"\$2\" 2>/dev/null || true
         fi
     }
-    
+
     # Helper function for idempotent tmpfs mounts
     dotmpfs() {
         if ! grep -q -w \"\$2\" /proc/mounts; then

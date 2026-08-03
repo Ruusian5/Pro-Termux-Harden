@@ -142,6 +142,8 @@ rm -f ~/x11_server.log*
 # ── 6. UNMOUNT (reverse of mount order) ──────────────────────────────
 if [ $CHROOT_MOUNTED -eq 1 ]; then
     echo -e "${C_YELLOW}[→] Unmounting chroot filesystems...${NC}"
+    # Isolate mount namespace so unmounts do not propagate back to host Android OS
+    su -c "mount --make-rprivate $DEBIANPATH" 2>/dev/null || true
     umount_count=0
     for mp in var/lock run dev/shm tmp data/data/com.termux/files/usr sdcard linkerconfig apex vendor system dev/pts sys proc dev; do
         if su -c "grep -q '$DEBIANPATH/$mp' /proc/mounts" 2>/dev/null; then
