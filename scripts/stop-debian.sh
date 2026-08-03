@@ -142,15 +142,18 @@ rm -f ~/x11_server.log*
 # ── 6. UNMOUNT (reverse of mount order) ──────────────────────────────
 if [ $CHROOT_MOUNTED -eq 1 ]; then
     echo -e "${C_YELLOW}[→] Unmounting chroot filesystems...${NC}"
-    # Isolate mount namespace so unmounts do not propagate back to host Android OS
-    su -c "mount --make-rprivate $DEBIANPATH" 2>/dev/null || true
-    umount_count=0
-    for mp in var/lock run dev/shm tmp sdcard dev/pts sys proc dev; do
-        if su -c "grep -q '$DEBIANPATH/$mp' /proc/mounts" 2>/dev/null; then
-            su -c "umount -l $DEBIANPATH/$mp" 2>/dev/null && umount_count=$((umount_count+1))
-        fi
-    done
-    echo -e "  ${C_GREEN}[✓] $umount_count mount(s) unmounted.${NC}"
+    su -c "
+        mount -o rprivate $DEBIANPATH $DEBIANPATH 2>/dev/null || true
+        for mp in var/lock run dev/shm tmp sdcard dev/pts sys proc dev; do
+            if grep -q \"$DEBIANPATH/\$mp\" /proc/mounts 2>/dev/null; then
+                umount -l \"$DEBIANPATH/\$mp\" 2>/dev/null || true
+            fi
+        done
+        while grep -q \"$DEBIANPATH\" /proc/mounts 2>/dev/null; do
+            umount -l \"$DEBIANPATH\" 2>/dev/null || break
+        done
+    "
+    echo -e "  ${C_GREEN}[✓] Chroot filesystems safely unmounted.${NC}"
 else
     echo -e "  ${C_YELLOW}[~] Chroot not mounted — skipping unmount${NC}"
 fi

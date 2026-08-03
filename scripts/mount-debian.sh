@@ -9,13 +9,18 @@ TERMUX_TMP="/data/data/com.termux/files/usr/tmp"
 echo -e "\e[1;33m[~] Synchronizing Hardware Bridges...\e[0m"
 
 su -c "
-    # Isolate mount namespace to prevent any propagation back to Android host
-    mount --make-rprivate $DEBIANPATH 2>/dev/null || true
+    # Self-bind DEBIANPATH so it becomes a dedicated mountpoint, then make it rprivate.
+    # Passing both arguments (\$DEBIANPATH \$DEBIANPATH) is REQUIRED for Android toybox mount
+    # so it does not fallback to reading missing /etc/fstab and changing host /data propagation.
+    if ! grep -q -w \"$DEBIANPATH\" /proc/mounts 2>/dev/null; then
+        mount -o bind \"$DEBIANPATH\" \"$DEBIANPATH\" 2>/dev/null || true
+    fi
+    mount -o rprivate \"$DEBIANPATH\" \"$DEBIANPATH\" 2>/dev/null || true
 
     # Helper function for idempotent bind mounts with rslave isolation
     domount() {
         if ! grep -q -w \"\$2\" /proc/mounts; then
-            mount --bind \"\$1\" \"\$2\" 2>/dev/null && mount --make-rslave \"\$2\" 2>/dev/null || true
+            mount -o bind \"\$1\" \"\$2\" 2>/dev/null && mount -o rslave \"\$2\" \"\$2\" 2>/dev/null || true
         fi
     }
 
