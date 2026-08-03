@@ -105,10 +105,10 @@ chmod 644 "$DEBIANPATH/etc/resolv.conf"
 
 # Guest Environment Preparation
 echo -e "\n${C_BOLD}[5/6] Hardening Guest User & Packages...${NC}"
-/data/data/com.termux/files/usr/bin/busybox chroot "$DEBIANPATH" /usr/bin/sh -c '
+chroot "$DEBIANPATH" /bin/sh -c '
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     export DEBIAN_FRONTEND=noninteractive
-    
+
     # Create User
     groupadd -g 1000 ruusian || true
     useradd -u 1000 -g 1000 -d /home/ruusian -s /bin/bash ruusian || true
@@ -121,11 +121,11 @@ echo -e "\n${C_BOLD}[5/6] Hardening Guest User & Packages...${NC}"
     apt update
     apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
         gcc libc6-dev xfce4 xfce4-terminal dbus-x11 picom python3 locales sudo openssh-client socat
-    
+
     # Set Passwords
     echo "root:1234" | chpasswd
     echo "ruusian:1234" | chpasswd
-    
+
     # Configure Sudo
     usermod -aG sudo ruusian
     echo "ruusian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ruusian-workstation
@@ -134,7 +134,7 @@ echo -e "\n${C_BOLD}[5/6] Hardening Guest User & Packages...${NC}"
 
 # Building Kernel Bypass Library
 echo -e "\n${C_BOLD}[6/6] Building Kernel Bypass Library...${NC}"
-/data/data/com.termux/files/usr/bin/busybox chroot "$DEBIANPATH" /usr/bin/sh -c '
+chroot "$DEBIANPATH" /bin/sh -c '
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     gcc -shared -fPIC -ldl /home/ruusian/fix_mmap.c -o /home/ruusian/fix_mmap.so
     echo "/home/ruusian/fix_mmap.so" > /etc/ld.so.preload

@@ -145,9 +145,9 @@ if [ $CHROOT_MOUNTED -eq 1 ]; then
     # Isolate mount namespace so unmounts do not propagate back to host Android OS
     su -c "mount --make-rprivate $DEBIANPATH" 2>/dev/null || true
     umount_count=0
-    for mp in var/lock run dev/shm tmp data/data/com.termux/files/usr sdcard linkerconfig apex vendor system dev/pts sys proc dev; do
+    for mp in var/lock run dev/shm tmp sdcard dev/pts sys proc dev; do
         if su -c "grep -q '$DEBIANPATH/$mp' /proc/mounts" 2>/dev/null; then
-            su -c "$B umount -l $DEBIANPATH/$mp" 2>/dev/null && umount_count=$((umount_count+1))
+            su -c "umount -l $DEBIANPATH/$mp" 2>/dev/null && umount_count=$((umount_count+1))
         fi
     done
     echo -e "  ${C_GREEN}[✓] $umount_count mount(s) unmounted.${NC}"
